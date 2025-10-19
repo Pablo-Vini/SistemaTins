@@ -3,9 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Produtos</title>
 </head>
 <body>
-    <h1>Pagina Produtos</h1>
+    
+    <header>
+        <h1>Pagina Produtos</h1>
+    </header>
+    <main>
+        <form action="{% url 'produtos' %}" method="POST">{% csrf_token %}
+            <input type="number" name="codigo" placeholder="Código">
+            <input type="text" name="descricao" placeholder="Descrição">
+            <input type="number" name="valor_unitario" placeholder="Valor unitário">
+            <input type="submit" value="Confirmar">
+        </form>
+    </main>
 </body>
 </html>
