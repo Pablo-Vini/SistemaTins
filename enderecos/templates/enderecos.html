@@ -6,6 +6,22 @@
     <title>Document</title>
 </head>
 <body>
-    <h1>Pagina Endereços</h1>
+    <header>
+        <h1>Pagina Endereços</h1>
+    </header>
+    <main>
+        <form action="{% url 'enderecos' %}" method="post">{% csrf_token %}
+            <input type="text" name="titulo" placeholder="titulo">
+            <input type="text" name="cep" placeholder="cep" maxlength="9">
+            <input type="text" name="logradouro" placeholder="Logradouro">
+            <input type="text" name="bairro" placeholder="Bairro">
+            <input type="text" name="cidade" placeholder="Cidade">
+            <input type="text" name="estado" placeholder="Estado">
+            <input type="text" name="numero" placeholder="Numero">
+            <input type="text" name="complemento" placeholder="Complemento">
+            <input type="text" name="cliente" placeholder="Cliente">
+            <input type="submit" value="Confirmar">
+        </form>
+    </main>
 </body>
 </html>

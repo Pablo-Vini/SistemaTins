@@ -12,7 +12,7 @@
     </header>
     <main>
         <form action="{% url 'produtos' %}" method="POST">{% csrf_token %}
-            <input type="number" name="codigo" placeholder="Código">
+            <input type="number" name="codigo" placeholder="Código" maxlength="6">
             <input type="text" name="descricao" placeholder="Descrição">
             <input type="number" name="valor_unitario" placeholder="Valor unitário">
             <input type="submit" value="Confirmar">
