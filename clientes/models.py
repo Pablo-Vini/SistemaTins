@@ -5,7 +5,6 @@ class Cliente(models.Model):
     cpf = models.CharField(max_length=14)
     email = models.CharField(max_length=30)
     telefone = models.CharField(max_length=20)
-    data_cadastro = models.CharField(max_length=20)
     
     def __str__(self):
         return self.nome
