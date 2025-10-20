@@ -9,4 +9,4 @@ class Pedido(models.Model):
     endereco = models.CharField(max_length=20)
     
     def __str__(self):
-        return self.nome
+        return self.codigo

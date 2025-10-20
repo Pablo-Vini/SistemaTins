@@ -1,3 +1,5 @@
 from django.contrib import admin
+from .models import Produto
 
-# Register your models here.
+#Permite adicionar dados no Banco pelo acesso de admin
+admin.site.register(Produto)

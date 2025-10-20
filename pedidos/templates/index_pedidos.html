@@ -10,12 +10,47 @@
 <body>
     <header>
         <h1>Pagina Index Pedidos</h1>
-        <a href="{% url 'cadastro_cliente' %}">Cadastrar Clientes</a>
-        <a href="{% url 'produtos' %}">Cadastrar Produtos</a>
-        <a href="{% url 'enderecos' %}">Adicionar Endereço</a>
+        <div class="links">
+            <a href="{% url 'criar_pedido' %}">Adicionar Pedido</a>
+            <a href="{% url 'cadastro_cliente' %}">Cadastrar Clientes</a>
+            <a href="{% url 'produtos' %}">Cadastrar Produtos</a>
+            <a href="{% url 'enderecos' %}">Adicionar Endereço</a>
+        </div>
+
     </header>
     <main>
-
+        <section>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Pedido</th>
+                        <th>Cliente</th>
+                        <th>Produto</th>
+                        <th>Valor Total</th>
+                        <th>Endereço</th>
+                        <th>Atualizar</th>
+                        <th>Deletar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in pedidos %}
+                        <tr>
+                            <td>{{i.codigo}}</td>
+                            <td>{{i.cliente}}</td>
+                            <td>{{i.produto}}</td>
+                            <td>{{i.valor_total}}</td>
+                            <td>{{i.endereco}}</td>
+                            <td>
+                                <a href="">Atualizar</a>
+                            </td>
+                            <td>
+                                <a href="{% url 'deletar_pedidos' i.id %}" class="btn_deletar">Deletar</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
     </main>
 
 </body>

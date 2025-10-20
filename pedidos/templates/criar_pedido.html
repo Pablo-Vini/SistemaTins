@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novo Pedido</title>
+</head>
+
+<body>
+    <header></header>
+    <main>
+        <section class="lista_clientes">
+            <div>
+                <h1>Clientes</h1>
+            </div>
+            <div>
+                {% for lc in clientes %}
+                <div class="cliente_item" data-cliente-id="{{ lc.id }}" data-cliente-cpf="{{ lc.cpf }}">
+                    <div><strong>{{ lc.nome }}</strong></div>
+                    <div>CPF: {{ lc.cpf }}</div>
+                    <div>{{ lc.email }}</div>
+                    <div>{{ lc.telefone }}</div>
+                    <div>{{ lc.data_cadastro }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            <div>
+                <a href="">Voltar</a>
+            </div>
+
+        </section>
+        <section class="lista_enderecos">
+            <div>
+                <h1>Endereços</h1>
+            </div>
+            <div>
+                <form action="">
+                    <ul>
+                        {% for le in enderecos %}
+
+                        <li class="endereco-item" data-cliente="{{ le.cliente }}" data-endereco-id="{{ le.id }}">
+                            <input type="radio" name="endereco_radio" checked>
+                            <strong>{{ le.titulo }}</strong>, {{ le.logradouro }} — {{ le.bairro }} - {{ le.cidade }}/{{
+                            le.estado }}
+
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </form>
+
+            </div>
+        </section>
+        <section class="lista_produtos">
+            <div class="pesquisa">
+                <h1>Produtos</h1>
+            </div>
+            <div class="lista">
+                <nav>
+                    <ul id="produtosList">
+                        {% for lp in produtos %}
+                        <li class="produto-item" data-produto-id="{{ lp.id }}" data-codigo="{{ lp.codigo }}"
+                            data-descricao="{{ lp.descricao }}" data-valor="{{ lp.valor_unitario }}">
+                            {{ lp.codigo }} - {{ lp.descricao }} - R$ {{ lp.valor_unitario }}
+                            <button class="btn-add" type="button">Adicionar</button>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </nav>
+            </div>
+            <div class="valor_total">
+                <div><strong>Total: R$ <span id="cartTotal">0.00</span></strong></div>
+                <div style="margin-top:10px;">
+                    <button id="btnEnviarPedido" type="button">Confirmar Pedido</button>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+
+
+<script>
+    (function () {
+        // Estado local
+        let clienteSelecionado = null; // objeto {id, cpf}
+        let enderecoSelecionadoId = null;
+        let carrinho = []; // [{produtoId, codigo, descricao, valor, quantidade}]
+
+        // Helpers
+        function qs(selector, ctx = document) { return ctx.querySelector(selector); }
+        function qsa(selector, ctx = document) { return Array.from(ctx.querySelectorAll(selector)); }
+        function formatMoney(n) { return Number(n).toFixed(2).replace('.', ','); }
+
+        // Elementos
+        const clientesList = qs('#clientesList');
+        const enderecosList = qs('#enderecosList');
+        const produtosList = qs('#produtosList');
+        const cartItems = qs('#cartItems');
+        const cartTotalEl = qs('#cartTotal');
+        const btnEnviar = qs('#btnEnviarPedido');
+        const pedidoStatus = qs('#pedidoStatus');
+
+        // Ao clicar em cliente: marcar e filtrar endereços
+        clientesList.addEventListener('click', function (e) {
+            const target = e.target.closest('.cliente-item');
+            if (!target) return;
+            // marca visual
+            qsa('.cliente-item').forEach(el => el.classList.remove('selected'));
+            target.classList.add('selected');
+
+            clienteSelecionado = {
+                id: target.dataset.clienteId,
+                cpf: target.dataset.clienteCpf
+            };
+
+            // Filtra endereços: apenas mostrar endereços com data-cliente == cpf do cliente
+            qsa('.endereco-item').forEach(li => {
+                if (li.dataset.cliente === clienteSelecionado.cpf) {
+                    li.classList.add('visible');
+                    // se não existe nenhum radio marcado, marca o primeiro visível
+                    const radio = li.querySelector('input[type="radio"]');
+                    if (radio && !enderecosList.querySelector('input[type="radio"]:checked')) {
+                        radio.checked = true;
+                        enderecoSelecionadoId = radio.value;
+                    }
+                } else {
+                    li.classList.remove('visible');
+                    const radio = li.querySelector('input[type="radio"]');
+                    if (radio) radio.checked = false;
+                }
+            });
+
+            // Atualiza enderecoSelecionadoId, caso tenha um radio visível marcado
+            const checked = enderecosList.querySelector('input[type="radio"]:checked');
+            enderecoSelecionadoId = checked ? checked.value : null;
+        });
+
+        // Monitorar mudança de radio de endereço
+        enderecosList.addEventListener('change', function (e) {
+            const input = e.target;
+            if (input && input.name === 'endereco_radio') {
+                enderecoSelecionadoId = input.value;
+            }
+        });
+
+        // Adicionar produto ao carrinho
+        produtosList.addEventListener('click', function (e) {
+            const btn = e.target.closest('.btn-add');
+            if (!btn) return;
+            const item = btn.closest('.produto-item');
+            const produtoId = item.dataset.produtoId;
+            const codigo = item.dataset.codigo;
+            const descricao = item.dataset.descricao;
+            const valor = parseFloat(item.dataset.valor);
+
+            // Se já existe no carrinho, incrementa quantidade
+            const existente = carrinho.find(p => p.produtoId === produtoId);
+            if (existente) {
+                existente.quantidade += 1;
+            } else {
+                carrinho.push({ produtoId, codigo, descricao, valor, quantidade: 1 });
+            }
+            renderCarrinho();
+        });
+
+        // Renderizar carrinho
+        function renderCarrinho() {
+            cartItems.innerHTML = '';
+            let total = 0;
+            carrinho.forEach((p, idx) => {
+                const li = document.createElement('li');
+                li.innerHTML = `${p.codigo} - ${p.descricao} - R$ ${p.valor.toFixed(2).replace('.', ',')} x ${p.quantidade}
+                <button data-idx="${idx}" class="btn-minus" type="button">-</button>
+                <button data-idx="${idx}" class="btn-plus" type="button">+</button>
+                <button data-idx="${idx}" class="btn-remove" type="button">Remover</button>
+            `;
+                cartItems.appendChild(li);
+                total += p.valor * p.quantidade;
+            });
+            cartTotalEl.textContent = total.toFixed(2).replace('.', ',');
+        }
+
+        // Handlers para +, -, remover no carrinho
+        cartItems.addEventListener('click', function (e) {
+            const btn = e.target.closest('button');
+            if (!btn) return;
+            const idx = parseInt(btn.dataset.idx);
+            if (isNaN(idx)) return;
+            if (btn.classList.contains('btn-plus')) {
+                carrinho[idx].quantidade += 1;
+            } else if (btn.classList.contains('btn-minus')) {
+                carrinho[idx].quantidade = Math.max(1, carrinho[idx].quantidade - 1);
+            } else if (btn.classList.contains('btn-remove')) {
+                carrinho.splice(idx, 1);
+            }
+            renderCarrinho();
+        });
+
+        // Enviar pedido ao servidor
+        btnEnviar.addEventListener('click', function () {
+            pedidoStatus.textContent = '';
+            if (!clienteSelecionado) {
+                pedidoStatus.style.color = 'red';
+                pedidoStatus.textContent = 'Selecione um cliente antes de enviar o pedido.';
+                return;
+            }
+            if (!enderecoSelecionadoId) {
+                pedidoStatus.style.color = 'red';
+                pedidoStatus.textContent = 'Selecione um endereço válido para o cliente selecionado.';
+                return;
+            }
+            if (carrinho.length === 0) {
+                pedidoStatus.style.color = 'red';
+                pedidoStatus.textContent = 'Adicione ao menos um produto ao carrinho.';
+                return;
+            }
+
+            // Monta payload
+            const payload = {
+                cliente_id: clienteSelecionado.id,
+                cliente_cpf: clienteSelecionado.cpf,
+                endereco_id: enderecoSelecionadoId,
+                produtos: carrinho.map(p => ({
+                    produto_id: p.produtoId,
+                    codigo: p.codigo,
+                    descricao: p.descricao,
+                    quantidade: p.quantidade,
+                    valor_unitario: p.valor
+                }))
+            };
+
+            // CSRF header (Django). Ajuste caso não use Django.
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+
+            fetch('/pedidos/novo/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(csrfToken ? { 'X-CSRFToken': csrfToken } : {})
+                },
+                body: JSON.stringify(payload)
+            })
+                .then(resp => {
+                    if (!resp.ok) throw new Error('Erro ao enviar pedido');
+                    return resp.json();
+                })
+                .then(data => {
+                    pedidoStatus.style.color = 'green';
+                    pedidoStatus.textContent = 'Pedido enviado com sucesso. ID: ' + (data.pedido_id || '—');
+                    // opcional: limpar carrinho/selecao
+                    carrinho = [];
+                    renderCarrinho();
+                    qsa('.cliente-item').forEach(el => el.classList.remove('selected'));
+                    clienteSelecionado = null;
+                    enderecoSelecionadoId = null;
+                    // esconder endereços novamente
+                    qsa('.endereco-item').forEach(li => li.classList.remove('visible'));
+                })
+                .catch(err => {
+                    pedidoStatus.style.color = 'red';
+                    pedidoStatus.textContent = 'Falha: ' + err.message;
+                });
+        });
+
+        // Inicializa render
+        renderCarrinho();
+    })();
+</script>
+
+</html>

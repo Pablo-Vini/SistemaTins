@@ -5,7 +5,7 @@ from django.urls import path, include
 urlpatterns = [
     # Comando para criação de admin: 
     # python manage.py createsuperuser
-    # admin criado Nome: root ; Senha: root
+    # admin criado Nome: admin ; Senha: 12345678
     path('admin/', admin.site.urls), 
     path('clientes/' , include('clientes.urls')),
     path('produtos/' , include('produtos.urls')),
