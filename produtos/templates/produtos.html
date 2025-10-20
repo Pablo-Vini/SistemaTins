@@ -9,6 +9,9 @@
     
     <header>
         <h1>Pagina Produtos</h1>
+        <a href="{% url 'cadastro_cliente' %}">Cadastrar Clientes</a>
+        <a href="{% url 'produtos' %}">Cadastrar Produtos</a>
+        <a href="{% url 'enderecos' %}">Adicionar Endereço</a>
     </header>
     <main>
         <form action="{% url 'produtos' %}" method="POST">{% csrf_token %}

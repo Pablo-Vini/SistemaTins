@@ -21,3 +21,12 @@ def produtos(request):
             dados_produto = Produto(codigo=codigo, descricao=descricao, valor_unitario=valor_unitario, data_cadastro=data_cadastro)
             dados_produto.save()
             return HttpResponse('Cadastro realizado com sucesso!')
+
+def index_pedidos(request):
+    return render(request, 'index_pedidos.html')
+
+def clientes(request):
+    return render(request, 'cadastro_cliente.html')
+
+def enderecos(request):
+    return render(request, 'enderecos.html')
