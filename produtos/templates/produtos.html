@@ -1,20 +1,20 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Produtos</title>
+    <link rel="stylesheet" href="{% static '/global/style.css' %}">
 </head>
 <body>
     
     <header>
         <h1>Pagina Produtos</h1>
-        <a href="{% url 'cadastro_cliente' %}">Cadastrar Clientes</a>
-        <a href="{% url 'produtos' %}">Cadastrar Produtos</a>
-        <a href="{% url 'enderecos' %}">Adicionar Endereço</a>
+        <button class="voltar" onclick="history.back()">Voltar</button>
     </header>
     <main>
-        <form action="{% url 'produtos' %}" method="POST">{% csrf_token %}
+        <form class="formulario" action="{% url 'produtos' %}" method="POST">{% csrf_token %}
             <input type="number" name="codigo" placeholder="Código" maxlength="6">
             <input type="text" name="descricao" placeholder="Descrição">
             <input type="number" name="valor_unitario" placeholder="Valor unitário">

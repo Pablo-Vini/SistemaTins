@@ -7,5 +7,6 @@ urlpatterns = [
     path('clientes/' , include('clientes.urls'), name='clientes'),
     path('produtos/' , include('produtos.urls'), name='produtos'),
     path('enderecos/' , include('enderecos.urls'), name='enderecos'),
-    path('deletar_pedido/<int:id>' , views.deletar_pedidos, name="deletar_pedidos")
+    path('deletar_pedido/<int:id>' , views.deletar_pedidos, name="deletar_pedidos"),
+    path('/pedidos/novo/', views.novo_pedido, name='novo_pedido')
 ]

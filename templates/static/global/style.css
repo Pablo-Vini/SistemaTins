@@ -1,0 +1,56 @@
+body{
+    margin: 0;
+    padding: 0;
+    background-color: aliceblue;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-around;
+}
+header{
+    width: 30%;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+
+}
+
+.links{
+    display: flex;
+    flex-direction: column;
+    margin-top: 30px;
+    font-size: 1.2em;
+}
+main{
+    padding: 50px;
+}
+.voltar{
+    width: 100px;
+    margin-top: 100px;
+    height: 30px;
+}
+
+
+
+tr{
+    border: solid 1px black;
+    padding: 5px;
+}
+th{
+    border: solid 1px black;
+    padding: 5px;
+}
+td{
+    border: solid 1px black;
+    padding: 5px;
+}
+
+.formulario{
+    border: solid 1px black;
+    display: flex;
+    flex-direction: column;
+    padding: 50px;
+}
+input{
+    margin-bottom: 20px;
+}
