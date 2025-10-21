@@ -13,4 +13,4 @@ class Endereco(models.Model):
     padrao = models.BooleanField()
     
     def __str__(self):
-        return self.nome
+        return self.cep
